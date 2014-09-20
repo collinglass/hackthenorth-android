@@ -146,7 +146,7 @@ public class Landing extends Activity {
 				if(System.currentTimeMillis() - lastAverageTime > 1000) {
 					lastAverageTime = System.currentTimeMillis();
 					
-					rateView.setText("" + sampleCount + " samples per second."
+					rateView.setText("" + sampleCount + " yuyjuyjuy."
 							+ "\n"
 							+ data.size() + " * 4-btye int * " + sampleCount + " samples = " + (4 * data.size() * sampleCount) + " Bps."
 									+ "\n"

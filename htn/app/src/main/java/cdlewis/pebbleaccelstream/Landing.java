@@ -28,7 +28,7 @@ public class Landing extends Activity {
 	public static final String TAG = Landing.class.getName();
 	private static final int NUM_SAMPLES = 15;
 	private static final int GRAPH_HISTORY = 200;
-	
+
 	//State
 	private int sampleCount = 0;
 	private long lastAverageTime = 0;
@@ -36,43 +36,43 @@ public class Landing extends Activity {
 	private GraphViewSeries seriesX, seriesY, seriesZ;
 	private int sampleCounter = 0;
 	private int totalData = 0;
-	
+
 	//Layout members
-	private TextView 
+	private TextView
 		xView,
 		yView,
 		zView,
 		rateView;
 	private Button startButton;
 	private GraphView gView;
-	
+
 	//Other members
 	private PebbleDataReceiver receiver;
 	private UUID uuid = UUID.fromString("2893b0c4-2bca-4c83-a33a-0ef6ba6c8b17");
 	private Handler handler = new Handler();
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_landing);
-		
+
 		xView = (TextView)findViewById(R.id.x_view);
 		yView = (TextView)findViewById(R.id.y_view);
 		zView = (TextView)findViewById(R.id.z_view);
 		rateView = (TextView)findViewById(R.id.rate_view);
 		startButton = (Button)findViewById(R.id.start_button);
-		
+
 		startButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				PebbleDictionary dict = new PebbleDictionary();
 				dict.addInt32(0, 0);
 				PebbleKit.sendDataToPebble(getApplicationContext(), uuid, dict);
 			}
-			
+
 		});
-		
+
 		//Graph
 		seriesX = new GraphViewSeries("X", new GraphViewSeriesStyle(Color.argb(255, 255, 0, 0), 2), new GraphViewData[] {
 		      new GraphViewData(1, 0)
@@ -83,7 +83,7 @@ public class Landing extends Activity {
 		seriesZ = new GraphViewSeries("Z", new GraphViewSeriesStyle(Color.argb(255, 0, 0, 255), 2), new GraphViewData[] {
 		      new GraphViewData(1, 0)
 		});
-			 
+
 		gView = new LineGraphView(this, "Pebble Accelerometer History");
 		gView.setShowLegend(true);
 		gView.setViewPort(0, GRAPH_HISTORY);
@@ -91,7 +91,7 @@ public class Landing extends Activity {
 		gView.addSeries(seriesX);
 		gView.addSeries(seriesY);
 		gView.addSeries(seriesZ);
-		 
+
 		LinearLayout layout = (LinearLayout) findViewById(R.id.graph_layout);
 		layout.addView(gView);
 	}
@@ -99,16 +99,16 @@ public class Landing extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
+
 		receiver = new PebbleDataReceiver(uuid) {
-			
+
 			@Override
 			public void receiveData(Context context, int transactionId, PebbleDictionary data) {
 				PebbleKit.sendAckToPebble(getApplicationContext(), transactionId);
-				
+
 				//Count total data
 				totalData += 3 * NUM_SAMPLES * 4;
-				
+
 				//Get data
 				latest_data = new int[3 * NUM_SAMPLES];
 //				Log.d(TAG, "NEW DATA PACKET");
@@ -122,17 +122,17 @@ public class Landing extends Activity {
 					}
 //					Log.d(TAG, "Sample " + i + " data: X: " + latest_data[(3 * i)] + ", Y: " + latest_data[(3 * i) + 1] + ", Z: " + latest_data[(3 * i) + 2]);
 				}
-				
+
 				//Show
 				handler.post(new Runnable() {
-					
+
 					@Override
 					public void run() {
 						xView.setText("X: " + latest_data[0]);
 						yView.setText("Y: " + latest_data[1]);
 						zView.setText("Z: " + latest_data[2]);
 					}
-					
+
 				});
 
 				//Show on graph
@@ -145,7 +145,7 @@ public class Landing extends Activity {
 
 				if(System.currentTimeMillis() - lastAverageTime > 1000) {
 					lastAverageTime = System.currentTimeMillis();
-					
+
 					rateView.setText("" + sampleCount + " yuyjuyjuy."
 							+ "\n"
 							+ data.size() + " * 4-btye int * " + sampleCount + " samples = " + (4 * data.size() * sampleCount) + " Bps."
@@ -156,19 +156,19 @@ public class Landing extends Activity {
 					sampleCount++;
 				}
 			}
-			
+
 		};
-		
+
 		PebbleKit.registerReceivedDataHandler(this, receiver);
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
-		
+
 		unregisterReceiver(receiver);
 	}
-	
+
 	private String getTotalDataString() {
 		if(totalData < 1000) {
 			return "" + totalData + " Bytes.";

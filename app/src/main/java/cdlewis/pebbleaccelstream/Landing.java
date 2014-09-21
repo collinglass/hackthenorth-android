@@ -1,14 +1,6 @@
 package cdlewis.pebbleaccelstream;
 
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.UUID;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.io.*;
 
 import android.app.Activity;
 import android.content.Context;
@@ -30,25 +22,13 @@ import com.jjoe64.graphview.GraphViewSeries;
 import com.jjoe64.graphview.GraphViewSeries.GraphViewSeriesStyle;
 import com.jjoe64.graphview.LineGraphView;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-
 public class Landing extends Activity {
 	
 	//Constants
 	public static final String TAG = Landing.class.getName();
 	private static final int NUM_SAMPLES = 15;
 	private static final int GRAPH_HISTORY = 200;
-
+	
 	//State
 	private int sampleCount = 0;
 	private long lastAverageTime = 0;
@@ -56,51 +36,43 @@ public class Landing extends Activity {
 	private GraphViewSeries seriesX, seriesY, seriesZ;
 	private int sampleCounter = 0;
 	private int totalData = 0;
-
+	
 	//Layout members
-	private TextView
+	private TextView 
 		xView,
 		yView,
 		zView,
 		rateView;
 	private Button startButton;
 	private GraphView gView;
-
+	
 	//Other members
 	private PebbleDataReceiver receiver;
-	private UUID uuid = UUID.fromString("2893b0c4-2bca-4c83-a33a-0ef6ba6c8b17");
+	private UUID uuid = UUID.fromString("8fed2532-bf1e-423b-924f-53c3ee4ae480");
 	private Handler handler = new Handler();
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_landing);
-        System.out.println("fff");
-        postData();
-       //String hi = postData();
-       //System.out.print(hi);
-
-
-
-        xView = (TextView)findViewById(R.id.x_view);
+		
+		xView = (TextView)findViewById(R.id.x_view);
 		yView = (TextView)findViewById(R.id.y_view);
 		zView = (TextView)findViewById(R.id.z_view);
 		rateView = (TextView)findViewById(R.id.rate_view);
 		startButton = (Button)findViewById(R.id.start_button);
-
-
+		
 		startButton.setOnClickListener(new OnClickListener() {
-
+			
 			@Override
 			public void onClick(View v) {
 				PebbleDictionary dict = new PebbleDictionary();
 				dict.addInt32(0, 0);
 				PebbleKit.sendDataToPebble(getApplicationContext(), uuid, dict);
-
 			}
-
+			
 		});
-
+		
 		//Graph
 		seriesX = new GraphViewSeries("X", new GraphViewSeriesStyle(Color.argb(255, 255, 0, 0), 2), new GraphViewData[] {
 		      new GraphViewData(1, 0)
@@ -111,7 +83,7 @@ public class Landing extends Activity {
 		seriesZ = new GraphViewSeries("Z", new GraphViewSeriesStyle(Color.argb(255, 0, 0, 255), 2), new GraphViewData[] {
 		      new GraphViewData(1, 0)
 		});
-
+			 
 		gView = new LineGraphView(this, "Pebble Accelerometer History");
 		gView.setShowLegend(true);
 		gView.setViewPort(0, GRAPH_HISTORY);
@@ -119,7 +91,7 @@ public class Landing extends Activity {
 		gView.addSeries(seriesX);
 		gView.addSeries(seriesY);
 		gView.addSeries(seriesZ);
-
+		 
 		LinearLayout layout = (LinearLayout) findViewById(R.id.graph_layout);
 		layout.addView(gView);
 	}
@@ -127,16 +99,16 @@ public class Landing extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
+		
 		receiver = new PebbleDataReceiver(uuid) {
-
+			
 			@Override
 			public void receiveData(Context context, int transactionId, PebbleDictionary data) {
 				PebbleKit.sendAckToPebble(getApplicationContext(), transactionId);
-
+				
 				//Count total data
 				totalData += 3 * NUM_SAMPLES * 4;
-
+				
 				//Get data
 				latest_data = new int[3 * NUM_SAMPLES];
 //				Log.d(TAG, "NEW DATA PACKET");
@@ -150,17 +122,17 @@ public class Landing extends Activity {
 					}
 //					Log.d(TAG, "Sample " + i + " data: X: " + latest_data[(3 * i)] + ", Y: " + latest_data[(3 * i) + 1] + ", Z: " + latest_data[(3 * i) + 2]);
 				}
-
+				
 				//Show
 				handler.post(new Runnable() {
-
+					
 					@Override
 					public void run() {
 						xView.setText("X: " + latest_data[0]);
 						yView.setText("Y: " + latest_data[1]);
 						zView.setText("Z: " + latest_data[2]);
 					}
-
+					
 				});
 
 				//Show on graph
@@ -173,8 +145,8 @@ public class Landing extends Activity {
 
 				if(System.currentTimeMillis() - lastAverageTime > 1000) {
 					lastAverageTime = System.currentTimeMillis();
-
-					rateView.setText("" + sampleCount + " yuyjuyjuy."
+					
+					rateView.setText("" + sampleCount + " samples per second."
 							+ "\n"
 							+ data.size() + " * 4-btye int * " + sampleCount + " samples = " + (4 * data.size() * sampleCount) + " Bps."
 									+ "\n"
@@ -184,19 +156,19 @@ public class Landing extends Activity {
 					sampleCount++;
 				}
 			}
-
+			
 		};
-
+		
 		PebbleKit.registerReceivedDataHandler(this, receiver);
 	}
-
+	
 	@Override
 	protected void onPause() {
 		super.onPause();
-
+		
 		unregisterReceiver(receiver);
 	}
-
+	
 	private String getTotalDataString() {
 		if(totalData < 1000) {
 			return "" + totalData + " Bytes.";
@@ -206,49 +178,4 @@ public class Landing extends Activity {
 			return "" + totalData / 1000000 + " MBytes.";
 		}
 	}
-
-    public void postData() {
-        // Create a new HttpClient and Post Header
-        try {
-            URL connection_url = new URL("http://posttestServer.com/post.php");
-            HttpURLConnection connection = (HttpURLConnection)connection_url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setReadTimeout(15*1000);
-            connection.connect();
-            System.out.println("ee");
-        } catch (Exception e)
-        {
-            System.out.println("Error");
-        }
-
-        //  HttpClient httpclient = new DefaultHttpClient();
-       // URL url = new URL("http://posttestServer.com/post.php")
-        //HttpPost httppost = new HttpPost("http://posttestserver.com/post.php");
-       // HttpGet httppost = new HttpGet("http://www.yoursite.com/script.php");
-//        try {
-//            // Add your data
-//            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-//           nameValuePairs.add(new BasicNameValuePair("spurrya", "isawesome and so is matt"));
-//        //    nameValuePairs.add(new BasicNameValuePair("stringdata", "AndDev is Cool!"));
-//            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-//
-//            // Execute HTTP Post Request
-//            HttpResponse response = httpclient.execute(httppost);
-//
-//
-//
-//
-//        } catch (Exception e)
-//        {
-//            System.out.println("Error reported");
-//        }
-
-
-
-    }
-
-
-
-
-
 }

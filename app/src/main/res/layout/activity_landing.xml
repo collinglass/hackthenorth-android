@@ -6,27 +6,17 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="#f0eae3"
     tools:context=".Landing" >
 
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center_horizontal"
-        android:text="PEBILEPSY"
-        android:layout_marginTop="30dp"
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Pebilepsy-Log History"
         android:textStyle="bold"
-        android:textSize="20dp"
-    />
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center_horizontal"
-        android:text="log history"
-        android:layout_marginTop="50dp"
-        android:textSize="17dp"
-    />
+        android:typeface="sans" />
 
     <TextView
         android:id="@+id/x_view"
@@ -34,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         android:text="NO DATA" />
 
     <TextView
@@ -61,33 +51,30 @@
         android:layout_below="@id/z_view"
         android:text="NO DATA" />
 
-    <Button
-        android:id="@+id/start_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="10dp"
-        android:layout_below="@id/rate_view"
-        android:text="START" />
-
     <!--<Button-->
-        <!--android:id="@+id/post_button"-->
+        <!--android:id="@+id/start_button"-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"-->
         <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_marginTop="10dp"-->
-        <!--android:layout_marginLeft="100dp"-->
         <!--android:layout_below="@id/rate_view"-->
-        <!--android:text="POST"-->
-        <!--android:onClick="postData"/>-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:text="START" />-->
 
     <LinearLayout
         android:id="@+id/graph_layout"
         android:layout_below="@id/start_button"
         android:layout_width="fill_parent"
         android:layout_height="300dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="150dp"
         android:orientation="vertical" >
     </LinearLayout>
+
+    <WebView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/webView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>
